@@ -24,7 +24,7 @@ python main.py
 
 # Как запустить тесты
 
-Для тестирования используется [pytest](https://docs.pytest.org/en/latest/), тестами покрыты фрагменты кода сложные в отладке: text_tools.py и адаптеры. Команды для запуска тестов:
+Для тестирования используется [pytest](https://docs.pytest.org/en/latest/), тестами покрыты фрагменты кода сложные в отладке: server.py, text_tools.py и адаптеры. Команды для запуска тестов:
 
 ```
 python -m pytest adapters/inosmi_ru.py
@@ -32,6 +32,10 @@ python -m pytest adapters/inosmi_ru.py
 
 ```
 python -m pytest text_tools.py
+```
+
+```
+python -m pytest server.py
 ```
 
 # Как проверить код

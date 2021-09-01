@@ -21,10 +21,6 @@ ICTERIC_WORDS_FILE_PATHS = (
 
 TEST_ARTICLES = (
     'https://inosmi.ru/military/20210901/250424381.html',
-    'https://inosmi.ru/politic/20210901/250427261.html',
-    'https://inosmi.ru/social/20210901/250422682.html',
-    'https://inosmi.ru/military/20210901/250424dsfsdf381.html',
-    'https://lenta.ru/brief/2021/08/26/afg_terror/',
 )
 
 
@@ -73,7 +69,7 @@ async def process_article(
     group_result,
     timeout
 ):
-    """Скачмвание и анализ объективности статьи."""
+    """Скачмвание и анализ объективности статьи по url."""
     try:
         async with async_timeout(timeout):
             html = await fetch(session, url)
@@ -110,6 +106,7 @@ async def process_article(
 
 
 async def process_articles_by_urls(urls, timeout=3):
+    """Скачмвание и анализ объективности статей по списку url."""
     async with aiohttp.ClientSession() as session:
         morph = pymorphy2.MorphAnalyzer()
         charged_words = await get_icteric_words(ICTERIC_WORDS_FILE_PATHS)
