@@ -54,7 +54,7 @@ async def get_icteric_words(file_paths):
     for path in file_paths:
         async with aiofiles.open(Path(path), mode='r') as file:
             words += (await file.read()).splitlines()
-    
+
     return words
 
 
@@ -65,7 +65,15 @@ async def fetch(session, url):
 
 
 @log_execution_time
-async def process_article(session, morph, charged_words, url, group_result, timeout):
+async def process_article(
+    session,
+    morph,
+    charged_words,
+    url,
+    group_result,
+    timeout
+):
+    """Скачмвание и анализ объективности статьи."""
     try:
         async with async_timeout(timeout):
             html = await fetch(session, url)
@@ -75,7 +83,7 @@ async def process_article(session, morph, charged_words, url, group_result, time
             group_result.append((
                 url,
                 ProcessingStatus.OK.value,
-                raiting, 
+                raiting,
                 len(words),
             ))
     except (aiohttp.InvalidURL, aiohttp.ClientResponseError):
@@ -101,7 +109,7 @@ async def process_article(session, morph, charged_words, url, group_result, time
         ))
 
 
-async def process_articles_by_urls(urls, timeout = 3):
+async def process_articles_by_urls(urls, timeout=3):
     async with aiohttp.ClientSession() as session:
         morph = pymorphy2.MorphAnalyzer()
         charged_words = await get_icteric_words(ICTERIC_WORDS_FILE_PATHS)
@@ -117,7 +125,7 @@ async def process_articles_by_urls(urls, timeout = 3):
                     group_result,
                     timeout,
                 )
-        
+
         return group_result
 
 
@@ -152,7 +160,23 @@ def run_server():
 
 
 def test_process_article():
-    assert asyncio.run(process_articles_by_urls(['1'])) == [('1', 'FETCH_ERROR', None, None)]
-    assert asyncio.run(process_articles_by_urls(['https://docs.python.org/ds'])) == [('https://docs.python.org/ds', 'FETCH_ERROR', None, None)]
-    assert asyncio.run(process_articles_by_urls(['https://yandex.ru'])) == [('https://yandex.ru', 'PARSING_ERROR', None, None)]
-    assert asyncio.run(process_articles_by_urls([TEST_ARTICLES[0]], timeout=0.1)) == [(TEST_ARTICLES[0], 'TIMEOUT', None, None)]
+    assert asyncio.run(
+        process_articles_by_urls(['1']),
+    ) == [
+        ('1', 'FETCH_ERROR', None, None),
+    ]
+    assert asyncio.run(
+        process_articles_by_urls(['https://docs.python.org/ds']),
+    ) == [
+        ('https://docs.python.org/ds', 'FETCH_ERROR', None, None),
+    ]
+    assert asyncio.run(
+        process_articles_by_urls(['https://yandex.ru']),
+    ) == [
+        ('https://yandex.ru', 'PARSING_ERROR', None, None),
+    ]
+    assert asyncio.run(
+        process_articles_by_urls([TEST_ARTICLES[0]], timeout=0.1),
+    ) == [
+        (TEST_ARTICLES[0], 'TIMEOUT', None, None),
+    ]
