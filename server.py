@@ -82,7 +82,7 @@ async def process_article(
                 raiting,
                 len(words),
             ))
-    except (aiohttp.InvalidURL, aiohttp.ClientResponseError):
+    except (aiohttp.InvalidURL, aiohttp.ClientConnectorError, aiohttp.ClientResponseError):
         group_result.append((
             url,
             ProcessingStatus.FETCH_ERROR.value,
@@ -163,9 +163,9 @@ def test_process_article():
         ('1', 'FETCH_ERROR', None, None),
     ]
     assert asyncio.run(
-        process_articles_by_urls(['https://docs.python.org/ds']),
+        process_articles_by_urls(['http://docs.error_python.org/']),
     ) == [
-        ('https://docs.python.org/ds', 'FETCH_ERROR', None, None),
+        ('http://docs.error_python.org/', 'FETCH_ERROR', None, None),
     ]
     assert asyncio.run(
         process_articles_by_urls(['https://yandex.ru']),
