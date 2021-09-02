@@ -47,8 +47,14 @@ pip install -r requirements.txt
 
 # Как запустить
 
+Локально
 ```python3
 python main.py
+```
+
+Docker
+```
+docker-compose up
 ```
 
 # Как запустить тесты
