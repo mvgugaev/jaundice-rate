@@ -70,39 +70,21 @@ async def process_article(
     timeout
 ):
     """Скачмвание и анализ объективности статьи по url."""
+    result = [url, ProcessingStatus.OK.value, None, None]
     try:
         async with async_timeout(timeout):
             html = await fetch(session, url)
             plaintext = adapters.SANITIZERS['inosmi_ru'](html, plaintext=True)
             words = await split_by_words(morph, plaintext)
             raiting = calculate_jaundice_rate(words, charged_words)
-            group_result.append((
-                url,
-                ProcessingStatus.OK.value,
-                raiting,
-                len(words),
-            ))
+            result[2], result[3] = raiting, len(words)
     except (aiohttp.InvalidURL, aiohttp.ClientConnectorError, aiohttp.ClientResponseError):
-        group_result.append((
-            url,
-            ProcessingStatus.FETCH_ERROR.value,
-            None,
-            None,
-        ))
+        result[1] = ProcessingStatus.FETCH_ERROR.value
     except adapters.ArticleNotFound:
-        group_result.append((
-            url,
-            ProcessingStatus.PARSING_ERROR.value,
-            None,
-            None,
-        ))
+        result[1] = ProcessingStatus.PARSING_ERROR.value
     except asyncio.TimeoutError:
-        group_result.append((
-            url,
-            ProcessingStatus.TIMEOUT.value,
-            None,
-            None,
-        ))
+        result[1] = ProcessingStatus.TIMEOUT.value
+    group_result.append(result)
 
 
 async def process_articles_by_urls(urls, timeout=5):
