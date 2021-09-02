@@ -105,7 +105,7 @@ async def process_article(
         ))
 
 
-async def process_articles_by_urls(urls, timeout=3):
+async def process_articles_by_urls(urls, timeout=5):
     """Скачмвание и анализ объективности статей по списку url."""
     async with aiohttp.ClientSession() as session:
         morph = pymorphy2.MorphAnalyzer()
