@@ -76,8 +76,8 @@ async def process_article(
             html = await fetch(session, url)
             plaintext = adapters.SANITIZERS['inosmi_ru'](html, plaintext=True)
             words = await split_by_words(morph, plaintext)
-            raiting = calculate_jaundice_rate(words, charged_words)
-            result[2], result[3] = raiting, len(words)
+            rating = calculate_jaundice_rate(words, charged_words)
+            result[2], result[3] = rating, len(words)
     except (aiohttp.InvalidURL, aiohttp.ClientConnectorError, aiohttp.ClientResponseError):
         result[1] = ProcessingStatus.FETCH_ERROR.value
     except adapters.ArticleNotFound:
@@ -121,11 +121,11 @@ async def handle(request):
     return web.json_response(
         [
             {
-                "status": redsult[1],
-                "url": redsult[0],
-                "score": redsult[2],
-                "words_count": redsult[3],
-            } for redsult in group_data
+                "status": result[1],
+                "url": result[0],
+                "score": result[2],
+                "words_count": result[3],
+            } for result in group_data
         ]
     )
 
