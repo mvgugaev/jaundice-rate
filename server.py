@@ -20,6 +20,8 @@ ICTERIC_WORDS_FILE_PATHS = (
 )
 
 TEST_ARTICLES = (
+    'http://docs.error_python.org/',
+    'https://ria.ru/20210903/tranzit-1748446816.html',
     'https://inosmi.ru/military/20210901/250424381.html',
 )
 
@@ -78,7 +80,11 @@ async def process_article(
             words = await split_by_words(morph, plaintext)
             rating = calculate_jaundice_rate(words, charged_words)
             result[2], result[3] = rating, len(words)
-    except (aiohttp.InvalidURL, aiohttp.ClientConnectorError, aiohttp.ClientResponseError):
+    except (
+        aiohttp.InvalidURL,
+        aiohttp.ClientConnectorError,
+        aiohttp.ClientResponseError,
+    ):
         result[1] = ProcessingStatus.FETCH_ERROR.value
     except adapters.ArticleNotFound:
         result[1] = ProcessingStatus.PARSING_ERROR.value
@@ -140,22 +146,22 @@ def run_server():
 
 def test_process_article():
     assert asyncio.run(
-        process_articles_by_urls(['1']),
+        process_articles_by_urls(['_']),
     ) == [
-        ('1', 'FETCH_ERROR', None, None),
+        ['_', 'FETCH_ERROR', None, None],
     ]
     assert asyncio.run(
-        process_articles_by_urls(['http://docs.error_python.org/']),
+        process_articles_by_urls([TEST_ARTICLES[0]]),
     ) == [
-        ('http://docs.error_python.org/', 'FETCH_ERROR', None, None),
+        [TEST_ARTICLES[0], 'FETCH_ERROR', None, None],
     ]
     assert asyncio.run(
-        process_articles_by_urls(['https://yandex.ru']),
+        process_articles_by_urls([TEST_ARTICLES[1]]),
     ) == [
-        ('https://yandex.ru', 'PARSING_ERROR', None, None),
+        [TEST_ARTICLES[1], 'PARSING_ERROR', None, None],
     ]
     assert asyncio.run(
-        process_articles_by_urls([TEST_ARTICLES[0]], timeout=0.1),
+        process_articles_by_urls([TEST_ARTICLES[2]], timeout=0.1),
     ) == [
-        (TEST_ARTICLES[0], 'TIMEOUT', None, None),
+        [TEST_ARTICLES[2], 'TIMEOUT', None, None],
     ]
